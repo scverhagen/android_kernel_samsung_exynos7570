@@ -1,0 +1,30 @@
+name: Build Kernel
+
+on: 
+  workflow_dispatch:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v2
+
+      - name: Clone cross-compiler
+        run: git clone https://github.com/YariKartoshe4ka/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9.git aarch64-linux-android-4.9
+      
+      - name: Run build script
+        run: bash build_kernel.sh
+
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v0.1.14
+        with:
+          files: arch/arm64/boot/Image.gz
+          name: Image.gz-${{ github.run_id }}
+          tag_name: ${{ github.run_id }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
